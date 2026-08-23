@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>プレビューの音量</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="mark" aria-hidden="true">N</div>
+        <div>
+          <h1>プレビューの音量</h1>
+          <p>ホームと作品詳細だけに適用</p>
+        </div>
+      </header>
+
+      <label class="enabled-row">
+        <span>音量調整</span>
+        <input id="enabled" type="checkbox" role="switch">
+      </label>
+
+      <fieldset id="controls">
+        <legend>音量の設定</legend>
+        <label class="choice">
+          <input type="radio" name="mode" value="mute">
+          <span>ミュート</span>
+        </label>
+        <label class="choice volume-choice">
+          <input type="radio" name="mode" value="volume">
+          <span>音量を指定</span>
+        </label>
+
+        <div class="slider-row">
+          <input id="volume" type="range" min="0" max="100" step="1" aria-label="プレビューの音量">
+          <output id="volumeValue" for="volume">20%</output>
+        </div>
+      </fieldset>
+
+      <label class="indicator-row">
+        <span class="indicator-label">プレビュー上にミュート・音量を表示</span>
+        <input id="showIndicator" type="checkbox" role="switch">
+      </label>
+
+      <p class="note">作品本編の音量には影響しません。</p>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

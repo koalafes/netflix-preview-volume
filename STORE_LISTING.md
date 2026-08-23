@@ -2,7 +2,7 @@
 
 ## 名前
 
-Netflix プレビュー音量
+Quiet Preview for Netflix
 
 ## 概要
 

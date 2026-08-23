@@ -12,10 +12,12 @@
   <rect width="440" height="280" fill="url(#bg)"/>
   <circle cx="364" cy="48" r="112" fill="#e50914" opacity=".09"/>
   <circle cx="402" cy="254" r="145" fill="#e50914" opacity=".06"/>
-  <rect x="34" y="40" width="88" height="88" rx="20" fill="#171717" stroke="url(#accent)" stroke-width="6"/>
-  <rect x="49" y="58" width="58" height="50" rx="9" fill="none" stroke="#e50914" stroke-width="5"/>
-  <path d="M63 75v17h8l12 9V66L71 75h-8Z" fill="#fff"/>
-  <path d="M89 75c4 3 6 6 6 9s-2 7-6 10" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <rect x="34" y="40" width="88" height="88" rx="20" fill="#0b0b0b" stroke="url(#accent)" stroke-width="4"/>
+  <path d="M51 54h12v57H51zM78 54h12v57H78z" fill="#e50914"/>
+  <path d="M51 54h12l27 57H78z" fill="#ff1f2b"/>
+  <circle cx="96" cy="101" r="17" fill="#181818" stroke="#fff" stroke-width="2"/>
+  <path d="M87 97v7h5l6 5V92l-6 5h-5Z" fill="#fff"/>
+  <path d="M102 96c3 2 4 4 4 6s-1 4-4 6" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
   <text x="34" y="170" fill="#fff" font-family="Yu Gothic, Meiryo, sans-serif" font-size="29" font-weight="700">プレビュー音量</text>
   <text x="35" y="207" fill="#d0d0d0" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17">突然の大きな音を防ぐ</text>
   <rect x="34" y="228" width="142" height="30" rx="15" fill="#e50914"/>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+  <defs>
+    <linearGradient id="background" x1="120" y1="70" x2="1160" y2="730" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#242424"/>
+      <stop offset="1" stop-color="#080808"/>
+    </linearGradient>
+    <linearGradient id="redGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ff2934"/>
+      <stop offset="1" stop-color="#a80810"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#000" flood-opacity=".55"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="800" fill="url(#background)"/>
+  <circle cx="1120" cy="70" r="280" fill="#e50914" opacity=".08"/>
+  <circle cx="80" cy="770" r="310" fill="#e50914" opacity=".05"/>
+
+  <g font-family="Yu Gothic, Meiryo, sans-serif">
+    <text x="110" y="250" fill="#fff" font-size="48" font-weight="700">Quiet Preview</text>
+    <text x="110" y="309" fill="#fff" font-size="48" font-weight="700">for Netflix</text>
+    <rect x="110" y="349" width="92" height="6" rx="3" fill="#e50914"/>
+    <text x="110" y="410" fill="#d2d2d2" font-size="25">プレビューだけをミュート・音量調整</text>
+    <text x="110" y="455" fill="#9b9b9b" font-size="20">作品本編の音量には影響しません</text>
+  </g>
+
+  <g transform="translate(700 70) scale(1.55)" filter="url(#shadow)">
+    <rect width="320" height="425" rx="12" fill="#141414" stroke="#363636"/>
+    <g transform="translate(18 18)" font-family="Yu Gothic, Meiryo, sans-serif">
+      <g>
+        <rect width="38" height="38" rx="8" fill="#080808"/>
+        <path d="M6 6h5v25H6zM20 6h5v25H20z" fill="#e50914"/>
+        <path d="M6 6h5l14 25h-5z" fill="#ff1f2b"/>
+        <circle cx="29" cy="28" r="8" fill="#181818" stroke="#fff" stroke-width="1.2"/>
+        <path d="M25 26v4h3l3 2v-8l-3 2h-3Z" fill="#fff"/>
+        <text x="50" y="16" fill="#f5f5f5" font-size="17" font-weight="700">プレビューの音量</text>
+        <text x="50" y="34" fill="#aaa" font-size="12">ホームと作品詳細だけに適用</text>
+      </g>
+
+      <g transform="translate(0 56)">
+        <rect width="284" height="48" rx="8" fill="#242424"/>
+        <text x="13" y="30" fill="#f5f5f5" font-size="14" font-weight="600">音量調整</text>
+        <rect x="233" y="13" width="38" height="22" rx="11" fill="#e50914"/>
+        <circle cx="260" cy="24" r="8" fill="#fff"/>
+      </g>
+
+      <g transform="translate(0 126)">
+        <text x="0" y="0" fill="#bbb" font-size="12">音量の設定</text>
+        <circle cx="6" cy="28" r="6" fill="#e50914"/>
+        <circle cx="6" cy="28" r="2.3" fill="#fff"/>
+        <text x="20" y="33" fill="#f5f5f5" font-size="14">ミュート</text>
+        <circle cx="6" cy="61" r="6" fill="none" stroke="#aaa" stroke-width="1.5"/>
+        <text x="20" y="66" fill="#f5f5f5" font-size="14">音量を指定</text>
+        <rect x="25" y="87" width="174" height="4" rx="2" fill="#666"/>
+        <rect x="25" y="87" width="35" height="4" rx="2" fill="#e50914"/>
+        <circle cx="60" cy="89" r="7" fill="#e50914"/>
+        <text x="239" y="94" fill="#ddd" font-size="13">20%</text>
+      </g>
+
+      <g transform="translate(0 260)">
+        <rect width="284" height="52" rx="8" fill="#1e1e1e"/>
+        <text x="13" y="22" fill="#f5f5f5" font-size="13">プレビュー上にミュート・</text>
+        <text x="13" y="39" fill="#f5f5f5" font-size="13">音量を表示</text>
+        <rect x="233" y="15" width="38" height="22" rx="11" fill="#e50914"/>
+        <circle cx="260" cy="26" r="8" fill="#fff"/>
+      </g>
+
+      <line x1="0" y1="333" x2="284" y2="333" stroke="#333"/>
+      <text x="0" y="359" fill="#aaa" font-size="12">作品本編の音量には影響しません。</text>
+    </g>
+  </g>
+</svg>

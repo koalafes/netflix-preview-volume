@@ -39,7 +39,7 @@
 
       <g transform="translate(0 56)">
         <rect width="284" height="48" rx="8" fill="#242424"/>
-        <text x="13" y="30" fill="#f5f5f5" font-size="14" font-weight="600">音量調整</text>
+        <text x="13" y="30" fill="#f5f5f5" font-size="14" font-weight="600">拡張機能を有効にする</text>
         <rect x="233" y="13" width="38" height="22" rx="11" fill="#e50914"/>
         <circle cx="260" cy="24" r="8" fill="#fff"/>
       </g>

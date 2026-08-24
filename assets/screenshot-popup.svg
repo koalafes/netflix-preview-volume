@@ -34,8 +34,7 @@
         <path d="M6 6h5l14 25h-5z" fill="#ff1f2b"/>
         <circle cx="29" cy="28" r="8" fill="#181818" stroke="#fff" stroke-width="1.2"/>
         <path d="M25 26v4h3l3 2v-8l-3 2h-3Z" fill="#fff"/>
-        <text x="50" y="16" fill="#f5f5f5" font-size="14" font-weight="700">Quiet Preview for Netflix</text>
-        <text x="50" y="34" fill="#aaa" font-size="12">ホームと作品詳細だけに適用</text>
+        <text x="50" y="25" fill="#f5f5f5" font-size="14" font-weight="700">Quiet Preview for Netflix</text>
       </g>
 
       <g transform="translate(0 56)">

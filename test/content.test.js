@@ -286,55 +286,20 @@ test("initial mute allows Netflix's native audio button to enable sound", async 
   await harness.settle();
   assert.equal(harness.detailsPreview.muted, true);
 
-  const previewScope = {
-    querySelectorAll(selector) {
-      return selector === "video" ? [harness.detailsPreview] : [];
-    }
-  };
-  const audioButton = {
-    closest(selector) {
-      if (selector.includes("button[data-uia='control-audio']")) return this;
-      if (selector.includes(".previewModal--container")) return previewScope;
-      return null;
-    }
-  };
-
-  // Capture listener marks this preview as user-controlled before Netflix's
-  // own handler unmutes it and emits volumechange.
-  harness.listeners.click({ target: audioButton });
-  harness.detailsPreview.muted = false;
   harness.listeners.volumechange({ target: harness.detailsPreview });
+  harness.detailsPreview.muted = false;
   harness.flushAnimationFrames();
 
   assert.equal(harness.detailsPreview.muted, false);
 });
 
-test("initial mute release works when Netflix places the audio button outside the video container", async () => {
+test("initial mute does not depend on finding Netflix's audio button", async () => {
   const harness = createHarness({ mode: "initialMute" });
   await harness.settle();
   assert.equal(harness.hero.muted, true);
 
-  const audioButton = {
-    parentElement: {
-      querySelectorAll() {
-        return [];
-      }
-    },
-    closest(selector) {
-      if (selector.includes("button[data-uia='control-audio']")) return this;
-      return null;
-    },
-    getBoundingClientRect() {
-      return { left: 840, top: 480, right: 880, bottom: 520, width: 40, height: 40 };
-    },
-    checkVisibility() {
-      return true;
-    }
-  };
-
-  harness.listeners.click({ target: audioButton });
-  harness.hero.muted = false;
   harness.listeners.volumechange({ target: harness.hero });
+  harness.hero.muted = false;
   harness.flushAnimationFrames();
 
   assert.equal(harness.hero.muted, false);
@@ -358,21 +323,8 @@ test("initial mute badge reflects when the native button releases mute", async (
   const badge = harness.createdElements.find((element) => element.className === "badge");
   assert.equal(badge.label.textContent, "🔇 開始時ミュート");
 
-  const previewScope = {
-    querySelectorAll(selector) {
-      return selector === "video" ? [harness.detailsPreview] : [];
-    }
-  };
-  const audioButton = {
-    closest(selector) {
-      if (selector.includes("button[data-uia='control-audio']")) return this;
-      if (selector.includes(".previewModal--container")) return previewScope;
-      return null;
-    }
-  };
-  harness.listeners.click({ target: audioButton });
-  harness.detailsPreview.muted = false;
   harness.listeners.volumechange({ target: harness.detailsPreview });
+  harness.detailsPreview.muted = false;
   harness.flushAnimationFrames();
 
   assert.equal(badge.label.textContent, "🔊 解除済み");
@@ -386,21 +338,8 @@ test("shows a speaker icon with the selected volume percentage", async () => {
   await harness.settle();
 
   const badge = harness.createdElements.find((element) => element.className === "badge");
-  const previewScope = {
-    querySelectorAll(selector) {
-      return selector === "video" ? [harness.hero] : [];
-    }
-  };
-  const audioButton = {
-    closest(selector) {
-      if (selector.includes("button[data-uia='control-audio']")) return this;
-      if (selector.includes(".previewModal--container")) return previewScope;
-      return null;
-    }
-  };
-  harness.listeners.click({ target: audioButton });
-  harness.hero.muted = false;
   harness.listeners.volumechange({ target: harness.hero });
+  harness.hero.muted = false;
   harness.flushAnimationFrames();
 
   assert.equal(badge.label.textContent, "🔉 20%");

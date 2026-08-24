@@ -37,6 +37,7 @@
   ].join(",");
   const originals = new Map();
   const pendingMediaEnforcement = new WeakSet();
+  const initialMuteApplied = new WeakSet();
   const initialMuteReleased = new WeakSet();
   let settings = { ...DEFAULT_SETTINGS };
   let observer;
@@ -94,7 +95,10 @@
     }
 
     if (settings.mode === "initialMute") {
-      if (!initialMuteReleased.has(video) && !video.muted) video.muted = true;
+      if (!initialMuteApplied.has(video)) {
+        initialMuteApplied.add(video);
+        if (!video.muted) video.muted = true;
+      }
       return;
     }
   }
@@ -106,6 +110,7 @@
     // Remove tracking first so a volumechange event caused by restoration
     // cannot immediately re-apply the extension setting.
     originals.delete(video);
+    initialMuteApplied.delete(video);
     initialMuteReleased.delete(video);
     video.muted = original.muted;
     video.volume = original.volume;
@@ -221,53 +226,6 @@
       }
     }
     return closest;
-  }
-
-  function findVideoForAudioButton(button) {
-    const scope = button.closest(
-      ".previewModal--container,[role='dialog'],.billboard-row,.billboard,[data-uia*='billboard'],[class*='billboard']"
-    ) || button.parentElement;
-    let candidates = [];
-
-    if (scope && typeof scope.querySelectorAll === "function") {
-      candidates = [...scope.querySelectorAll("video")].filter(isTargetVideo);
-    }
-    if (!candidates.length) {
-      candidates = [...originals.keys()].filter(isTargetVideo);
-    }
-    if (isDetailsPreviewOpen()) {
-      candidates = candidates.filter((video) => video.closest(
-        ".previewModal--container,.previewModal--player_container,[class*='previewModal'],[role='dialog']"
-      ));
-    }
-    if (!candidates.length) return null;
-
-    const buttonRect = getVisibleRect(button);
-    if (!buttonRect) {
-      return chooseVisibleTarget(new Set(candidates))?.video || null;
-    }
-
-    const buttonX = buttonRect.left + buttonRect.width / 2;
-    const buttonY = buttonRect.top + buttonRect.height / 2;
-    let bestVideo;
-    let bestScore = Infinity;
-    for (const video of candidates) {
-      const rect = getVisibleRect(video);
-      if (!rect) continue;
-      const dx = Math.max(rect.left - buttonX, 0, buttonX - rect.right);
-      const dy = Math.max(rect.top - buttonY, 0, buttonY - rect.bottom);
-      const distance = Math.hypot(dx, dy);
-      const area = rect.width * rect.height;
-
-      // Prefer a preview containing the clicked button. If a small hover card
-      // overlaps the large billboard, its smaller area breaks the tie.
-      const score = distance * 1e9 + area;
-      if (score < bestScore) {
-        bestVideo = video;
-        bestScore = score;
-      }
-    }
-    return bestVideo || chooseVisibleTarget(new Set(candidates))?.video || null;
   }
 
   function hideIndicator() {
@@ -405,25 +363,12 @@
     pendingMediaEnforcement.add(video);
     requestAnimationFrame(() => {
       pendingMediaEnforcement.delete(video);
+      if (settings.mode === "initialMute" && initialMuteApplied.has(video) && !video.muted) {
+        initialMuteReleased.add(video);
+      }
       enforce(video);
       scheduleIndicatorUpdate();
     });
-  }
-
-  function handleAudioButtonClick(event) {
-    if (!settings.enabled || settings.mode !== "initialMute") return;
-
-    const clicked = event.target;
-    if (!clicked || typeof clicked.closest !== "function") return;
-    const button = clicked.closest(AUDIO_BUTTON_SELECTOR);
-    if (!button) return;
-    const video = findVideoForAudioButton(button);
-    if (!video) return;
-    initialMuteReleased.add(video);
-
-    // Netflix changes the media state in its own click handler, which runs
-    // after this capture listener. Refresh the badge once that change lands.
-    requestAnimationFrame(scheduleIndicatorUpdate);
   }
 
   async function loadSettings() {
@@ -455,7 +400,6 @@
     document.addEventListener("play", handleMediaEvent, true);
     document.addEventListener("loadedmetadata", handleMediaEvent, true);
     document.addEventListener("volumechange", handleMediaEvent, true);
-    document.addEventListener("click", handleAudioButtonClick, true);
 
     window.addEventListener("resize", scheduleIndicatorUpdate, { passive: true });
     window.addEventListener("scroll", scheduleIndicatorUpdate, { passive: true, capture: true });
@@ -478,7 +422,10 @@
         const previousMode = settings.mode;
         settings.mode = nextMode;
         if (previousMode !== nextMode && nextMode === "initialMute") {
-          for (const video of originals.keys()) initialMuteReleased.delete(video);
+          for (const video of originals.keys()) {
+            initialMuteApplied.delete(video);
+            initialMuteReleased.delete(video);
+          }
         }
         if (previousMode !== nextMode && nextMode === "off") {
           for (const [video, original] of originals) video.muted = original.muted;

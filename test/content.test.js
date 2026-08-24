@@ -309,6 +309,37 @@ test("initial mute allows Netflix's native audio button to enable sound", async 
   assert.equal(harness.detailsPreview.muted, false);
 });
 
+test("initial mute release works when Netflix places the audio button outside the video container", async () => {
+  const harness = createHarness({ mode: "initialMute" });
+  await harness.settle();
+  assert.equal(harness.hero.muted, true);
+
+  const audioButton = {
+    parentElement: {
+      querySelectorAll() {
+        return [];
+      }
+    },
+    closest(selector) {
+      if (selector.includes("button[data-uia='control-audio']")) return this;
+      return null;
+    },
+    getBoundingClientRect() {
+      return { left: 840, top: 480, right: 880, bottom: 520, width: 40, height: 40 };
+    },
+    checkVisibility() {
+      return true;
+    }
+  };
+
+  harness.listeners.click({ target: audioButton });
+  harness.hero.muted = false;
+  harness.listeners.volumechange({ target: harness.hero });
+  harness.flushAnimationFrames();
+
+  assert.equal(harness.hero.muted, false);
+});
+
 test("shows an extension-owned status badge for the controlled preview", async () => {
   const harness = createHarness({}, { ui: true });
   await harness.settle();

@@ -271,7 +271,7 @@
         label = released ? "🔇 ミュート" : "🔇 開始時ミュート";
         title = released
           ? "Netflixの音声ボタンでミュート中"
-          : "Netflixの音声ボタンで解除できます";
+          : "あとから音を出せます";
       } else if (settings.volumeEnabled) {
         label = `${speakerIcon} ${roundedVolume}%`;
         title = `プレビューの音量を${roundedVolume}%に設定中`;

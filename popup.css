@@ -76,7 +76,16 @@ h1 {
 }
 
 .indicator-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   line-height: 1.4;
+}
+
+.indicator-icon {
+  flex: 0 0 auto;
+  font-size: 15px;
+  line-height: 1;
 }
 
 input[role="switch"] {

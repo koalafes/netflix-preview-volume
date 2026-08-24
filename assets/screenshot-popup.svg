@@ -70,8 +70,9 @@
 
       <g transform="translate(0 358)">
         <rect width="284" height="52" rx="8" fill="#1e1e1e"/>
-        <text x="13" y="22" fill="#f5f5f5" font-size="13">プレビュー上にミュート・</text>
-        <text x="13" y="39" fill="#f5f5f5" font-size="13">音量を表示</text>
+        <text x="13" y="32" fill="#f5f5f5" font-size="15">🔊</text>
+        <text x="36" y="22" fill="#f5f5f5" font-size="13">プレビュー上にミュート・</text>
+        <text x="36" y="39" fill="#f5f5f5" font-size="13">音量を表示</text>
         <rect x="233" y="15" width="38" height="22" rx="11" fill="#e50914"/>
         <circle cx="260" cy="26" r="8" fill="#fff"/>
       </g>

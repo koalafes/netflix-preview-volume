@@ -264,7 +264,7 @@
       label = "🔇 常にミュート";
       title = "拡張機能により常にミュート中";
     } else if (settings.mode === "initialMute") {
-      label = target.video.muted ? "🔇 解除可能" : "🔊 解除済み";
+      label = target.video.muted ? "🔇 開始時ミュート" : "🔊 解除済み";
       title = target.video.muted
         ? "Netflixの音声ボタンで解除できます"
         : "Netflixの音声ボタンでミュート解除済み";

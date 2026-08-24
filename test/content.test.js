@@ -282,7 +282,7 @@ test("initial mute badge reflects when the native button releases mute", async (
   const harness = createHarness({ mode: "initialMute" }, { details: true, ui: true });
   await harness.settle();
   const badge = harness.createdElements.find((element) => element.className === "badge");
-  assert.equal(badge.label.textContent, "🔇 解除可能");
+  assert.equal(badge.label.textContent, "🔇 開始時ミュート");
 
   const previewScope = {
     querySelectorAll(selector) {

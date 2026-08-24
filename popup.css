@@ -115,6 +115,17 @@ legend {
   font-size: 14px;
 }
 
+.choice-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.choice-copy small {
+  color: #999;
+  font-size: 11px;
+  font-weight: 400;
+}
+
 .choice input { accent-color: #e50914; }
 
 .slider-row {

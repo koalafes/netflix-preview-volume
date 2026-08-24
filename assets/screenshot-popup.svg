@@ -22,7 +22,7 @@
     <text x="110" y="309" fill="#fff" font-size="48" font-weight="700">for Netflix</text>
     <rect x="110" y="349" width="92" height="6" rx="3" fill="#e50914"/>
     <text x="110" y="410" fill="#d2d2d2" font-size="25">プレビューだけをミュート・音量調整</text>
-    <text x="110" y="455" fill="#9b9b9b" font-size="20">作品本編の音量には影響しません</text>
+    <text x="110" y="455" fill="#9b9b9b" font-size="20">ℹ️ 作品本編の音量には影響しません</text>
   </g>
 
   <g transform="translate(745 38) scale(1.38)" filter="url(#shadow)">
@@ -78,7 +78,7 @@
       </g>
 
       <line x1="0" y1="431" x2="284" y2="431" stroke="#333"/>
-      <text x="0" y="457" fill="#aaa" font-size="12">作品本編の音量には影響しません。</text>
+      <text x="0" y="457" fill="#aaa" font-size="12">ℹ️ 作品本編の音量には影響しません。</text>
     </g>
   </g>
 </svg>

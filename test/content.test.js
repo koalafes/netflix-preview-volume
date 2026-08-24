@@ -314,7 +314,7 @@ test("shows an extension-owned status badge for the controlled preview", async (
   assert.equal(badge.innerHTML, '<span class="label"></span>');
   assert.equal(badge.label.textContent, "🔇 開始時ミュート");
   assert.equal(badge.style.display, "flex");
-  assert.equal(badge.title, "あとから音を出せます");
+  assert.equal(badge.title, "あとから解除できます");
 });
 
 test("initial mute badge reflects when the native button releases mute", async () => {

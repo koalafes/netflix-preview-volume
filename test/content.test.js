@@ -201,12 +201,26 @@ test("default setting mutes only the billboard video", async () => {
   assert.equal(harness.regular.volume, 0.7);
 });
 
-test("volume mode applies the selected volume to the billboard", async () => {
-  const harness = createHarness({ mode: "volume", volume: 15 });
+test("volume setting applies while initial mute remains active", async () => {
+  const harness = createHarness({ mode: "initialMute", volumeEnabled: true, volume: 15 });
   await harness.settle();
 
-  assert.equal(harness.hero.muted, false);
+  assert.equal(harness.hero.muted, true);
   assert.equal(harness.hero.volume, 0.15);
+});
+
+test("disabling the separate volume setting restores the original volume", async () => {
+  const harness = createHarness({ mode: "initialMute", volumeEnabled: true, volume: 15 });
+  await harness.settle();
+  assert.equal(harness.hero.volume, 0.15);
+
+  harness.listeners.storage(
+    { volumeEnabled: { oldValue: true, newValue: false } },
+    "sync"
+  );
+
+  assert.equal(harness.hero.muted, true);
+  assert.equal(harness.hero.volume, 0.8);
 });
 
 test("title-details autoplay preview uses the same mute setting", async () => {
@@ -225,7 +239,7 @@ test("jbv dialog fallback works if Netflix renames the preview classes", async (
 });
 
 test("always mute cannot be overwritten by Netflix's native audio button", async () => {
-  const harness = createHarness({}, { details: true });
+  const harness = createHarness({ mode: "mute" }, { details: true });
   await harness.settle();
   assert.equal(harness.detailsPreview.muted, true);
 
@@ -273,9 +287,9 @@ test("shows an extension-owned status badge for the controlled preview", async (
   const badge = harness.createdElements.find((element) => element.className === "badge");
   assert.ok(badge);
   assert.equal(badge.innerHTML, '<span class="label"></span>');
-  assert.equal(badge.label.textContent, "🔇 常にミュート");
+  assert.equal(badge.label.textContent, "🔇 開始時ミュート");
   assert.equal(badge.style.display, "flex");
-  assert.equal(badge.title, "拡張機能により常にミュート中");
+  assert.equal(badge.title, "Netflixの音声ボタンで解除できます");
 });
 
 test("initial mute badge reflects when the native button releases mute", async () => {
@@ -305,12 +319,32 @@ test("initial mute badge reflects when the native button releases mute", async (
 });
 
 test("shows a speaker icon with the selected volume percentage", async () => {
-  const harness = createHarness({ mode: "volume", volume: 20 }, { ui: true });
+  const harness = createHarness(
+    { mode: "initialMute", volumeEnabled: true, volume: 20 },
+    { ui: true }
+  );
   await harness.settle();
 
   const badge = harness.createdElements.find((element) => element.className === "badge");
+  const previewScope = {
+    querySelectorAll(selector) {
+      return selector === "video" ? [harness.hero] : [];
+    }
+  };
+  const audioButton = {
+    closest(selector) {
+      if (selector.includes("button[data-uia='control-audio']")) return this;
+      if (selector.includes(".previewModal--container")) return previewScope;
+      return null;
+    }
+  };
+  harness.listeners.click({ target: audioButton });
+  harness.hero.muted = false;
+  harness.listeners.volumechange({ target: harness.hero });
+  harness.flushAnimationFrames();
+
   assert.equal(badge.label.textContent, "🔉 20%");
-  assert.equal(badge.title, "拡張機能により音量を20%に固定中");
+  assert.equal(badge.title, "プレビューの音量を20%に設定中");
 });
 
 test("can hide the status badge without disabling mute control", async () => {

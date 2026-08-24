@@ -3,7 +3,8 @@
 
   const DEFAULT_SETTINGS = Object.freeze({
     enabled: true,
-    mode: "mute",
+    mode: "initialMute",
+    volumeEnabled: false,
     volume: 20,
     showIndicator: true
   });
@@ -70,7 +71,7 @@
   }
 
   function normalizeMode(mode) {
-    return mode === "volume" || mode === "initialMute" ? mode : "mute";
+    return mode === "mute" ? "mute" : "initialMute";
   }
 
   function enforce(video) {
@@ -80,6 +81,13 @@
     }
 
     remember(video);
+    if (settings.volumeEnabled) {
+      const targetVolume = Math.min(1, Math.max(0, settings.volume / 100));
+      if (Math.abs(video.volume - targetVolume) > 0.001) {
+        video.volume = targetVolume;
+      }
+    }
+
     if (settings.mode === "mute") {
       if (!video.muted) video.muted = true;
       return;
@@ -90,11 +98,6 @@
       return;
     }
 
-    const targetVolume = Math.min(1, Math.max(0, settings.volume / 100));
-    if (video.muted) video.muted = false;
-    if (Math.abs(video.volume - targetVolume) > 0.001) {
-      video.volume = targetVolume;
-    }
   }
 
   function restore(video) {
@@ -263,14 +266,20 @@
     if (settings.mode === "mute") {
       label = "🔇 常にミュート";
       title = "拡張機能により常にミュート中";
-    } else if (settings.mode === "initialMute") {
-      label = target.video.muted ? "🔇 開始時ミュート" : "🔊 解除済み";
-      title = target.video.muted
-        ? "Netflixの音声ボタンで解除できます"
-        : "Netflixの音声ボタンでミュート解除済み";
     } else {
-      label = `${speakerIcon} ${roundedVolume}%`;
-      title = `拡張機能により音量を${roundedVolume}%に固定中`;
+      const released = initialMuteReleased.has(target.video);
+      if (target.video.muted) {
+        label = released ? "🔇 ミュート" : "🔇 開始時ミュート";
+        title = released
+          ? "Netflixの音声ボタンでミュート中"
+          : "Netflixの音声ボタンで解除できます";
+      } else if (settings.volumeEnabled) {
+        label = `${speakerIcon} ${roundedVolume}%`;
+        title = `プレビューの音量を${roundedVolume}%に設定中`;
+      } else {
+        label = "🔊 解除済み";
+        title = "Netflixの音声ボタンでミュート解除済み";
+      }
     }
 
     indicatorBadge.querySelector(".label").textContent = label;
@@ -370,9 +379,11 @@
 
   async function loadSettings() {
     const stored = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+    const legacyVolumeMode = stored.mode === "volume";
     settings = {
       enabled: Boolean(stored.enabled),
       mode: normalizeMode(stored.mode),
+      volumeEnabled: stored.volumeEnabled === true || legacyVolumeMode,
       volume: Number.isFinite(Number(stored.volume))
         ? Math.min(100, Math.max(0, Number(stored.volume)))
         : DEFAULT_SETTINGS.volume,
@@ -413,7 +424,24 @@
       if (area !== "sync") return;
 
       if (changes.enabled) settings.enabled = Boolean(changes.enabled.newValue);
-      if (changes.mode) settings.mode = normalizeMode(changes.mode.newValue);
+      if (changes.mode) {
+        const nextMode = normalizeMode(changes.mode.newValue);
+        if (settings.mode !== nextMode && nextMode === "initialMute") {
+          for (const video of originals.keys()) initialMuteReleased.delete(video);
+        }
+        settings.mode = nextMode;
+      }
+      if (changes.volumeEnabled) {
+        const wasEnabled = settings.volumeEnabled;
+        settings.volumeEnabled = changes.volumeEnabled.newValue === true;
+        if (wasEnabled && !settings.volumeEnabled) {
+          for (const [video, original] of originals) {
+            if (Math.abs(video.volume - original.volume) > 0.001) {
+              video.volume = original.volume;
+            }
+          }
+        }
+      }
       if (changes.volume) {
         settings.volume = Math.min(100, Math.max(0, Number(changes.volume.newValue) || 0));
       }

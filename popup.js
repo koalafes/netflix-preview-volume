@@ -3,7 +3,8 @@
 
   const DEFAULT_SETTINGS = {
     enabled: true,
-    mode: "mute",
+    mode: "initialMute",
+    volumeEnabled: false,
     volume: 20,
     showIndicator: true
   };
@@ -11,6 +12,7 @@
   const enabled = document.querySelector("#enabled");
   const controls = document.querySelector("#controls");
   const volume = document.querySelector("#volume");
+  const volumeEnabled = document.querySelector("#volumeEnabled");
   const volumeValue = document.querySelector("#volumeValue");
   const showIndicator = document.querySelector("#showIndicator");
   const status = document.querySelector("#status");
@@ -18,16 +20,18 @@
   let statusTimer;
 
   function selectedMode() {
-    return modeInputs.find((input) => input.checked)?.value || "mute";
+    return modeInputs.find((input) => input.checked)?.value || "initialMute";
   }
 
   function normalizeMode(mode) {
-    return mode === "volume" || mode === "initialMute" ? mode : "mute";
+    return mode === "mute" ? "mute" : "initialMute";
   }
 
   function updateUi() {
-    controls.disabled = !enabled.checked;
-    volume.disabled = !enabled.checked || selectedMode() !== "volume";
+    controls.classList.toggle("disabled", !enabled.checked);
+    for (const input of modeInputs) input.disabled = !enabled.checked;
+    volumeEnabled.disabled = !enabled.checked;
+    volume.disabled = !enabled.checked || !volumeEnabled.checked;
     volumeValue.textContent = `${volume.value}%`;
   }
 
@@ -58,6 +62,10 @@
 
   volume.addEventListener("input", updateUi);
   volume.addEventListener("change", () => save({ volume: Number(volume.value) }));
+  volumeEnabled.addEventListener("change", () => {
+    updateUi();
+    save({ volumeEnabled: volumeEnabled.checked });
+  });
   showIndicator.addEventListener("change", () => {
     save({ showIndicator: showIndicator.checked });
   });
@@ -66,6 +74,7 @@
     enabled.checked = Boolean(stored.enabled);
     showIndicator.checked = stored.showIndicator !== false;
     volume.value = String(Math.min(100, Math.max(0, Number(stored.volume) || 0)));
+    volumeEnabled.checked = stored.volumeEnabled === true || stored.mode === "volume";
     const mode = normalizeMode(stored.mode);
     document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true;
     updateUi();

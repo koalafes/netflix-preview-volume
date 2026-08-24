@@ -224,7 +224,7 @@ test("jbv dialog fallback works if Netflix renames the preview classes", async (
   assert.equal(harness.detailsPreview.muted, true);
 });
 
-test("Netflix cannot overwrite mute after its native audio button event", async () => {
+test("always mute cannot be overwritten by Netflix's native audio button", async () => {
   const harness = createHarness({}, { details: true });
   await harness.settle();
   assert.equal(harness.detailsPreview.muted, true);
@@ -238,6 +238,34 @@ test("Netflix cannot overwrite mute after its native audio button event", async 
   assert.equal(harness.detailsPreview.muted, true);
 });
 
+test("initial mute allows Netflix's native audio button to enable sound", async () => {
+  const harness = createHarness({ mode: "initialMute" }, { details: true });
+  await harness.settle();
+  assert.equal(harness.detailsPreview.muted, true);
+
+  const previewScope = {
+    querySelectorAll(selector) {
+      return selector === "video" ? [harness.detailsPreview] : [];
+    }
+  };
+  const audioButton = {
+    closest(selector) {
+      if (selector.includes("button[data-uia='control-audio']")) return this;
+      if (selector.includes(".previewModal--container")) return previewScope;
+      return null;
+    }
+  };
+
+  // Capture listener marks this preview as user-controlled before Netflix's
+  // own handler unmutes it and emits volumechange.
+  harness.listeners.click({ target: audioButton });
+  harness.detailsPreview.muted = false;
+  harness.listeners.volumechange({ target: harness.detailsPreview });
+  harness.flushAnimationFrames();
+
+  assert.equal(harness.detailsPreview.muted, false);
+});
+
 test("shows an extension-owned status badge for the controlled preview", async () => {
   const harness = createHarness({}, { ui: true });
   await harness.settle();
@@ -245,9 +273,35 @@ test("shows an extension-owned status badge for the controlled preview", async (
   const badge = harness.createdElements.find((element) => element.className === "badge");
   assert.ok(badge);
   assert.equal(badge.innerHTML, '<span class="label"></span>');
-  assert.equal(badge.label.textContent, "🔇 ミュート");
+  assert.equal(badge.label.textContent, "🔇 常にミュート");
   assert.equal(badge.style.display, "flex");
-  assert.equal(badge.title, "拡張機能によりミュート固定中");
+  assert.equal(badge.title, "拡張機能により常にミュート中");
+});
+
+test("initial mute badge reflects when the native button releases mute", async () => {
+  const harness = createHarness({ mode: "initialMute" }, { details: true, ui: true });
+  await harness.settle();
+  const badge = harness.createdElements.find((element) => element.className === "badge");
+  assert.equal(badge.label.textContent, "🔇 解除可能");
+
+  const previewScope = {
+    querySelectorAll(selector) {
+      return selector === "video" ? [harness.detailsPreview] : [];
+    }
+  };
+  const audioButton = {
+    closest(selector) {
+      if (selector.includes("button[data-uia='control-audio']")) return this;
+      if (selector.includes(".previewModal--container")) return previewScope;
+      return null;
+    }
+  };
+  harness.listeners.click({ target: audioButton });
+  harness.detailsPreview.muted = false;
+  harness.listeners.volumechange({ target: harness.detailsPreview });
+  harness.flushAnimationFrames();
+
+  assert.equal(badge.label.textContent, "🔊 解除済み");
 });
 
 test("shows a speaker icon with the selected volume percentage", async () => {

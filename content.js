@@ -36,6 +36,7 @@
   ].join(",");
   const originals = new Map();
   const pendingMediaEnforcement = new WeakSet();
+  const initialMuteReleased = new WeakSet();
   let settings = { ...DEFAULT_SETTINGS };
   let observer;
   let scheduled = false;
@@ -68,6 +69,10 @@
     }
   }
 
+  function normalizeMode(mode) {
+    return mode === "volume" || mode === "initialMute" ? mode : "mute";
+  }
+
   function enforce(video) {
     if (!settings.enabled || !isTargetVideo(video)) {
       restore(video);
@@ -77,6 +82,11 @@
     remember(video);
     if (settings.mode === "mute") {
       if (!video.muted) video.muted = true;
+      return;
+    }
+
+    if (settings.mode === "initialMute") {
+      if (!initialMuteReleased.has(video) && !video.muted) video.muted = true;
       return;
     }
 
@@ -94,6 +104,7 @@
     // Remove tracking first so a volumechange event caused by restoration
     // cannot immediately re-apply the extension setting.
     originals.delete(video);
+    initialMuteReleased.delete(video);
     video.muted = original.muted;
     video.volume = original.volume;
   }
@@ -247,14 +258,23 @@
         : target.rect.bottom - 62;
     const roundedVolume = Math.round(settings.volume);
     const speakerIcon = roundedVolume === 0 ? "🔇" : roundedVolume < 50 ? "🔉" : "🔊";
-    const label = settings.mode === "mute"
-      ? "🔇 ミュート"
-      : `${speakerIcon} ${roundedVolume}%`;
+    let label;
+    let title;
+    if (settings.mode === "mute") {
+      label = "🔇 常にミュート";
+      title = "拡張機能により常にミュート中";
+    } else if (settings.mode === "initialMute") {
+      label = target.video.muted ? "🔇 解除可能" : "🔊 解除済み";
+      title = target.video.muted
+        ? "Netflixの音声ボタンで解除できます"
+        : "Netflixの音声ボタンでミュート解除済み";
+    } else {
+      label = `${speakerIcon} ${roundedVolume}%`;
+      title = `拡張機能により音量を${roundedVolume}%に固定中`;
+    }
 
     indicatorBadge.querySelector(".label").textContent = label;
-    indicatorBadge.title = settings.mode === "mute"
-      ? "拡張機能によりミュート固定中"
-      : `拡張機能により音量を${roundedVolume}%に固定中`;
+    indicatorBadge.title = title;
     indicatorBadge.style.left = `${Math.max(8, left)}px`;
     indicatorBadge.style.top = `${Math.max(16, top)}px`;
     indicatorBadge.style.display = "flex";
@@ -322,14 +342,37 @@
     requestAnimationFrame(() => {
       pendingMediaEnforcement.delete(video);
       enforce(video);
+      scheduleIndicatorUpdate();
     });
+  }
+
+  function handleAudioButtonClick(event) {
+    if (!settings.enabled || settings.mode !== "initialMute") return;
+
+    const clicked = event.target;
+    if (!clicked || typeof clicked.closest !== "function") return;
+    const button = clicked.closest(AUDIO_BUTTON_SELECTOR);
+    if (!button) return;
+
+    const scope = button.closest(
+      ".previewModal--container,[role='dialog'],.billboard-row,.billboard,[data-uia*='billboard'],[class*='billboard']"
+    ) || button.parentElement;
+    if (!scope || typeof scope.querySelectorAll !== "function") return;
+
+    for (const video of scope.querySelectorAll("video")) {
+      if (isTargetVideo(video)) initialMuteReleased.add(video);
+    }
+
+    // Netflix changes the media state in its own click handler, which runs
+    // after this capture listener. Refresh the badge once that change lands.
+    requestAnimationFrame(scheduleIndicatorUpdate);
   }
 
   async function loadSettings() {
     const stored = await chrome.storage.sync.get(DEFAULT_SETTINGS);
     settings = {
       enabled: Boolean(stored.enabled),
-      mode: stored.mode === "volume" ? "volume" : "mute",
+      mode: normalizeMode(stored.mode),
       volume: Number.isFinite(Number(stored.volume))
         ? Math.min(100, Math.max(0, Number(stored.volume)))
         : DEFAULT_SETTINGS.volume,
@@ -352,6 +395,7 @@
     document.addEventListener("play", handleMediaEvent, true);
     document.addEventListener("loadedmetadata", handleMediaEvent, true);
     document.addEventListener("volumechange", handleMediaEvent, true);
+    document.addEventListener("click", handleAudioButtonClick, true);
 
     window.addEventListener("resize", scheduleIndicatorUpdate, { passive: true });
     window.addEventListener("scroll", scheduleIndicatorUpdate, { passive: true, capture: true });
@@ -369,7 +413,7 @@
       if (area !== "sync") return;
 
       if (changes.enabled) settings.enabled = Boolean(changes.enabled.newValue);
-      if (changes.mode) settings.mode = changes.mode.newValue === "volume" ? "volume" : "mute";
+      if (changes.mode) settings.mode = normalizeMode(changes.mode.newValue);
       if (changes.volume) {
         settings.volume = Math.min(100, Math.max(0, Number(changes.volume.newValue) || 0));
       }

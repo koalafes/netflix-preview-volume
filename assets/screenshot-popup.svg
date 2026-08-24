@@ -26,7 +26,7 @@
   </g>
 
   <g transform="translate(700 70) scale(1.55)" filter="url(#shadow)">
-    <rect width="320" height="425" rx="12" fill="#141414" stroke="#363636"/>
+    <rect width="320" height="455" rx="12" fill="#141414" stroke="#363636"/>
     <g transform="translate(18 18)" font-family="Yu Gothic, Meiryo, sans-serif">
       <g>
         <rect width="38" height="38" rx="8" fill="#080808"/>
@@ -49,16 +49,18 @@
         <text x="0" y="0" fill="#bbb" font-size="12">音量の設定</text>
         <circle cx="6" cy="28" r="6" fill="#e50914"/>
         <circle cx="6" cy="28" r="2.3" fill="#fff"/>
-        <text x="20" y="33" fill="#f5f5f5" font-size="14">ミュート</text>
+        <text x="20" y="33" fill="#f5f5f5" font-size="14">常にミュート</text>
         <circle cx="6" cy="61" r="6" fill="none" stroke="#aaa" stroke-width="1.5"/>
-        <text x="20" y="66" fill="#f5f5f5" font-size="14">音量を指定</text>
-        <rect x="25" y="87" width="174" height="4" rx="2" fill="#666"/>
-        <rect x="25" y="87" width="35" height="4" rx="2" fill="#e50914"/>
-        <circle cx="60" cy="89" r="7" fill="#e50914"/>
-        <text x="239" y="94" fill="#ddd" font-size="13">20%</text>
+        <text x="20" y="66" fill="#f5f5f5" font-size="14">解除できるミュート</text>
+        <circle cx="6" cy="94" r="6" fill="none" stroke="#aaa" stroke-width="1.5"/>
+        <text x="20" y="99" fill="#f5f5f5" font-size="14">音量を指定</text>
+        <rect x="25" y="120" width="174" height="4" rx="2" fill="#666"/>
+        <rect x="25" y="120" width="35" height="4" rx="2" fill="#e50914"/>
+        <circle cx="60" cy="122" r="7" fill="#e50914"/>
+        <text x="239" y="127" fill="#ddd" font-size="13">20%</text>
       </g>
 
-      <g transform="translate(0 260)">
+      <g transform="translate(0 293)">
         <rect width="284" height="52" rx="8" fill="#1e1e1e"/>
         <text x="13" y="22" fill="#f5f5f5" font-size="13">プレビュー上にミュート・</text>
         <text x="13" y="39" fill="#f5f5f5" font-size="13">音量を表示</text>
@@ -66,8 +68,8 @@
         <circle cx="260" cy="26" r="8" fill="#fff"/>
       </g>
 
-      <line x1="0" y1="333" x2="284" y2="333" stroke="#333"/>
-      <text x="0" y="359" fill="#aaa" font-size="12">作品本編の音量には影響しません。</text>
+      <line x1="0" y1="366" x2="284" y2="366" stroke="#333"/>
+      <text x="0" y="392" fill="#aaa" font-size="12">作品本編の音量には影響しません。</text>
     </g>
   </g>
 </svg>

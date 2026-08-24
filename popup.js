@@ -21,6 +21,10 @@
     return modeInputs.find((input) => input.checked)?.value || "mute";
   }
 
+  function normalizeMode(mode) {
+    return mode === "volume" || mode === "initialMute" ? mode : "mute";
+  }
+
   function updateUi() {
     controls.disabled = !enabled.checked;
     volume.disabled = !enabled.checked || selectedMode() !== "volume";
@@ -62,7 +66,7 @@
     enabled.checked = Boolean(stored.enabled);
     showIndicator.checked = stored.showIndicator !== false;
     volume.value = String(Math.min(100, Math.max(0, Number(stored.volume) || 0)));
-    const mode = stored.mode === "volume" ? "volume" : "mute";
+    const mode = normalizeMode(stored.mode);
     document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true;
     updateUi();
   });

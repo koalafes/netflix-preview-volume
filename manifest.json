@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Quiet Preview for Netflix",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "description": "Netflixを開いた瞬間の「あの大きな音」にさようなら。プレビューだけを静かにして、本編はいつもの音量で楽しめます。",
   "icons": {
     "16": "icons/icon16.png",

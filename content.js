@@ -71,7 +71,7 @@
   }
 
   function normalizeMode(mode) {
-    return mode === "mute" ? "mute" : "initialMute";
+    return mode === "mute" || mode === "off" ? mode : "initialMute";
   }
 
   function enforce(video) {
@@ -97,7 +97,6 @@
       if (!initialMuteReleased.has(video) && !video.muted) video.muted = true;
       return;
     }
-
   }
 
   function restore(video) {
@@ -266,7 +265,7 @@
     if (settings.mode === "mute") {
       label = "🔇 常にミュート";
       title = "拡張機能により常にミュート中";
-    } else {
+    } else if (settings.mode === "initialMute") {
       const released = initialMuteReleased.has(target.video);
       if (target.video.muted) {
         label = released ? "🔇 ミュート" : "🔇 開始時ミュート";
@@ -280,6 +279,15 @@
         label = "🔊 解除済み";
         title = "Netflixの音声ボタンでミュート解除済み";
       }
+    } else if (target.video.muted) {
+      label = "🔇 ミュート";
+      title = "Netflix側でミュート中";
+    } else if (settings.volumeEnabled) {
+      label = `${speakerIcon} ${roundedVolume}%`;
+      title = `プレビューの音量を${roundedVolume}%に設定中`;
+    } else {
+      label = "🔊 ミュートOFF";
+      title = "拡張機能によるミュートはOFFです";
     }
 
     indicatorBadge.querySelector(".label").textContent = label;
@@ -426,10 +434,14 @@
       if (changes.enabled) settings.enabled = Boolean(changes.enabled.newValue);
       if (changes.mode) {
         const nextMode = normalizeMode(changes.mode.newValue);
-        if (settings.mode !== nextMode && nextMode === "initialMute") {
+        const previousMode = settings.mode;
+        settings.mode = nextMode;
+        if (previousMode !== nextMode && nextMode === "initialMute") {
           for (const video of originals.keys()) initialMuteReleased.delete(video);
         }
-        settings.mode = nextMode;
+        if (previousMode !== nextMode && nextMode === "off") {
+          for (const [video, original] of originals) video.muted = original.muted;
+        }
       }
       if (changes.volumeEnabled) {
         const wasEnabled = settings.volumeEnabled;

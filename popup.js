@@ -24,7 +24,7 @@
   }
 
   function normalizeMode(mode) {
-    return mode === "mute" ? "mute" : "initialMute";
+    return mode === "mute" || mode === "off" ? mode : "initialMute";
   }
 
   function updateUi() {

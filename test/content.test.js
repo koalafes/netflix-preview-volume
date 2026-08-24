@@ -223,6 +223,35 @@ test("disabling the separate volume setting restores the original volume", async
   assert.equal(harness.hero.volume, 0.8);
 });
 
+test("mute off leaves Netflix's original mute state unchanged", async () => {
+  const harness = createHarness({ mode: "off" });
+  await harness.settle();
+
+  assert.equal(harness.hero.muted, false);
+  assert.equal(harness.hero.volume, 0.8);
+});
+
+test("mute off can be combined with the separate volume setting", async () => {
+  const harness = createHarness({ mode: "off", volumeEnabled: true, volume: 15 });
+  await harness.settle();
+
+  assert.equal(harness.hero.muted, false);
+  assert.equal(harness.hero.volume, 0.15);
+});
+
+test("switching to mute off removes the extension-applied mute", async () => {
+  const harness = createHarness();
+  await harness.settle();
+  assert.equal(harness.hero.muted, true);
+
+  harness.listeners.storage(
+    { mode: { oldValue: "initialMute", newValue: "off" } },
+    "sync"
+  );
+
+  assert.equal(harness.hero.muted, false);
+});
+
 test("title-details autoplay preview uses the same mute setting", async () => {
   const harness = createHarness({}, { details: true });
   await harness.settle();
